@@ -1,3 +1,8 @@
+import drillLookup from "./drill_lookup.json"
+const DrillLookup = drillLookup as {
+    [key: string]: number
+};
+
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
 
 window.onload = () => {
@@ -36,7 +41,20 @@ class Calculator {
         const val = material.value;
         const sfm = Number(val);
 
-        const diameter = Number(this.diameterElement.value);
+        let input = this.diameterElement.value as string;
+        let diameter = 0.0;
+        if (input in DrillLookup) {
+            diameter = DrillLookup[input]
+            setLabel("diameter_note", `${input} has a diameter of ${diameter}`)
+        } else {
+            diameter = Number(input);
+            if (!diameter) {
+                setLabel("diameter_note", "Enter diameter like .25, A or #23")
+            } else {
+                setLabel("diameter_note", `Diameter ${diameter}`)
+            }
+        }
+
 
         let reco = recommend(sfm, diameter);
 
@@ -54,6 +72,6 @@ export function recommend(sfm: number, diameter: number): DrillReco {
 }
 
 function setLabel(id: string, value: number | string) {
-    var output = document.getElementById(id) as HTMLLabelElement;
+    const output = document.getElementById(id) as HTMLLabelElement;
     output.innerHTML = String(value)
 }
