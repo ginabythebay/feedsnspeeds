@@ -20,6 +20,13 @@ html {
     color: #fff;
   }
 
+  select{
+    background-color: #18c;
+    background-image: linear-gradient(#26a 0%, #06a 100%);
+    font-family: "Bree Serif", Arial, sans-serif;
+    color: #eee;
+  }
+
   h1, h2 {
     margin: 0 0 2rem 0;
     padding: 2rem;
@@ -73,25 +80,25 @@ html {
     width: 100%;
     height: 100%;
     margin-bottom: 1.4rem;
-      font-size: 1.6rem;
+    font-size: 1.6rem;
   }
 
   .para {
       position: relative;
       display: block;
-    justify-content: left;
-    align-items: left;
-    width: 100%;
-    height: 100%;
-    margin-bottom: 1.4rem;
+      justify-content: left;
+      align-items: left;
+      width: 100%;
+      height: 100%;
+      margin-bottom: 1.4rem;
       font-size: 1.6rem;
   }
 
   .item label {
       padding: 1rem 2rem;
-    font-size: 4rem;
-    line-height: 2;
-    color: rgba(255, 255, 255, 0.5);
+      font-size: 4rem;
+      line-height: 2;
+      color: rgba(255, 255, 255, 0.5);
   }
 
   .item label b {

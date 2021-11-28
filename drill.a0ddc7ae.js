@@ -117,9 +117,12 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"index.ts":[function(require,module,exports) {
+})({"drill.ts":[function(require,module,exports) {
 "use strict";
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
 
 window.onload = function () {
@@ -153,18 +156,27 @@ function () {
     var val = material.value;
     var sfm = Number(val);
     var diameter = Number(this.diameterElement.value);
-    var rpm = Math.round(3.8197 / diameter * sfm);
-    var ipr = Math.min(.25, .001 * (diameter / .0625));
-    var ipm = ipr * rpm;
-    console.log("ipr = " + ipr);
+    var reco = recommend(sfm, diameter);
     setLabel("sfm", sfm);
-    setLabel("rpm", rpm);
-    setLabel("ipm", ipm.toFixed(1));
-    setLabel("depth", (diameter * 4).toFixed(3));
+    setLabel("rpm", reco.rpm);
+    setLabel("ipm", reco.ipm.toFixed(1));
+    setLabel("depth", reco.maxDepth.toFixed(3));
   };
 
   return Calculator;
 }();
+
+function recommend(sfm, diameter) {
+  var ipr = Math.min(.25, .001 * (diameter / .0625));
+  var rpm = Math.round(3.8197 / diameter * sfm);
+  return {
+    rpm: rpm,
+    ipm: ipr * rpm,
+    maxDepth: diameter * 4
+  };
+}
+
+exports.recommend = recommend;
 
 function setLabel(id, value) {
   var output = document.getElementById(id);
@@ -198,7 +210,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34767" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45465" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
@@ -374,5 +386,5 @@ function hmrAcceptRun(bundle, id) {
     return true;
   }
 }
-},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","index.ts"], null)
-//# sourceMappingURL=/src.77de5100.js.map
+},{}]},{},["../node_modules/parcel-bundler/src/builtins/hmr-runtime.js","drill.ts"], null)
+//# sourceMappingURL=/drill.a0ddc7ae.js.map
