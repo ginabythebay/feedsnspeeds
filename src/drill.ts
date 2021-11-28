@@ -16,6 +16,12 @@ window.onload = () => {
     calculator.calc();
 };
 
+export interface DrillReco {
+    rpm: number;
+    ipm: number;
+    maxDepth: number;
+}
+
 class Calculator {
     materialsMenu: HTMLOptionsCollection;
     diameterElement: HTMLInputElement;
@@ -30,18 +36,21 @@ class Calculator {
         const val = material.value;
         const sfm = Number(val);
 
-
         const diameter = Number(this.diameterElement.value);
-        const rpm = Math.round((3.8197 / diameter) * sfm)
-        const ipr = Math.min(.25, .001 * (diameter / .0625))
-        const ipm = ipr * rpm
-        console.log("ipr = " + ipr)
+
+        let reco = recommend(sfm, diameter);
 
         setLabel("sfm", sfm)
-        setLabel("rpm", rpm)
-        setLabel("ipm", ipm.toFixed(1))
-        setLabel("depth", (diameter * 4).toFixed(3))
+        setLabel("rpm", reco.rpm)
+        setLabel("ipm", reco.ipm.toFixed(1))
+        setLabel("depth", reco.maxDepth.toFixed(3))
     }
+}
+
+export function recommend(sfm: number, diameter: number): DrillReco {
+    const ipr = Math.min(.25, .001 * (diameter / .0625))
+    const rpm = Math.round((3.8197 / diameter) * sfm)
+    return { rpm: rpm, ipm: ipr * rpm, maxDepth: diameter * 4 }
 }
 
 function setLabel(id: string, value: number | string) {
