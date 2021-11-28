@@ -129,7 +129,9 @@ window.onload = function () {
       var inputElement = ev.target;
       drill(inputElement);
     });
-  });
+  }); // calcs value on page reload if something was already entered
+
+  drill(drillInput);
 };
 
 function drill(inputElement) {
@@ -178,7 +180,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42331" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "36473" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
