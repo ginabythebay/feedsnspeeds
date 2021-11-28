@@ -20,6 +20,13 @@ html {
     color: #fff;
   }
 
+  select{
+    background-color: #18c;
+    background-image: linear-gradient(#26a 0%, #06a 100%);
+    font-family: "Bree Serif", Arial, sans-serif;
+    color: #eee;
+  }
+
   h1, h2 {
     margin: 0 0 2rem 0;
     padding: 2rem;
