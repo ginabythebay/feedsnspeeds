@@ -16,7 +16,7 @@ window.onload = () => {
     calculator.calc();
 };
 
-export interface DrillReco {
+interface DrillReco {
     rpm: number;
     ipm: number;
     maxDepth: number;
