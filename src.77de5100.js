@@ -123,30 +123,48 @@ parcelRequire = (function (modules, cache, entry, globalName) {
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
 
 window.onload = function () {
+  var materialsMenu = document.getElementById("material");
   var drillInput = document.getElementById("drill_diameter");
+  var calculator = new Calculator(materialsMenu, drillInput);
   possibleEvents.forEach(function (eventName) {
-    drillInput.addEventListener(eventName, function (ev) {
-      var inputElement = ev.target;
-      drill(inputElement);
+    drillInput.addEventListener(eventName, function () {
+      calculator.calc();
     });
-  }); // calcs value on page reload if something was already entered
+  });
 
-  drill(drillInput);
+  materialsMenu.onchange = function () {
+    calculator.calc();
+  }; // calcs value on page reload if something was already entered
+
+
+  calculator.calc();
 };
 
-function drill(inputElement) {
-  var sfm = 250; // for Aluminum
+var Calculator =
+/** @class */
+function () {
+  function Calculator(materialsMenu, diameterElement) {
+    this.materialsMenu = materialsMenu.options;
+    this.diameterElement = diameterElement;
+  }
 
-  var diameter = Number(inputElement.value);
-  var rpm = Math.round(3.8197 / diameter * sfm);
-  var ipr = Math.min(.25, .001 * (diameter / .0625));
-  var ipm = ipr * rpm;
-  console.log("ipr = " + ipr);
-  setLabel("sfm", sfm);
-  setLabel("rpm", rpm);
-  setLabel("ipm", ipm.toFixed(1));
-  setLabel("depth", (diameter * 4).toFixed(3));
-}
+  Calculator.prototype.calc = function () {
+    var material = this.materialsMenu.item(this.materialsMenu.selectedIndex);
+    var val = material.value;
+    var sfm = Number(val);
+    var diameter = Number(this.diameterElement.value);
+    var rpm = Math.round(3.8197 / diameter * sfm);
+    var ipr = Math.min(.25, .001 * (diameter / .0625));
+    var ipm = ipr * rpm;
+    console.log("ipr = " + ipr);
+    setLabel("sfm", sfm);
+    setLabel("rpm", rpm);
+    setLabel("ipm", ipm.toFixed(1));
+    setLabel("depth", (diameter * 4).toFixed(3));
+  };
+
+  return Calculator;
+}();
 
 function setLabel(id, value) {
   var output = document.getElementById(id);
@@ -180,7 +198,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "36473" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "35287" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
