@@ -8,6 +8,8 @@ window.onload = () => {
             drill(inputElement)
         })
     });
+    // calcs value on page reload if something was already entered
+    drill(drillInput)
 };
 
 function drill(inputElement: HTMLInputElement) {
