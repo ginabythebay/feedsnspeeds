@@ -117,12 +117,130 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"drill.ts":[function(require,module,exports) {
+})({"drill_lookup.json":[function(require,module,exports) {
+module.exports = {
+  "#80": 0.0135,
+  "#79": 0.0145,
+  "#78": 0.016,
+  "#77": 0.018,
+  "#76": 0.02,
+  "#75": 0.021,
+  "#74": 0.0225,
+  "#73": 0.024,
+  "#72": 0.025,
+  "#71": 0.026,
+  "#70": 0.028,
+  "#69": 0.0292,
+  "#68": 0.031,
+  "#67": 0.032,
+  "#66": 0.033,
+  "#65": 0.035,
+  "#64": 0.036,
+  "#63": 0.037,
+  "#62": 0.038,
+  "#61": 0.039,
+  "#60": 0.04,
+  "#59": 0.041,
+  "#58": 0.042,
+  "#56": 0.0465,
+  "#55": 0.052,
+  "#54": 0.055,
+  "#53": 0.0595,
+  "#52": 0.0635,
+  "#51": 0.067,
+  "#50": 0.07,
+  "#49": 0.073,
+  "#48": 0.076,
+  "#47": 0.0785,
+  "#46": 0.081,
+  "#45": 0.082,
+  "#44": 0.086,
+  "#43": 0.089,
+  "#42": 0.0935,
+  "#41": 0.096,
+  "#40": 0.098,
+  "#39": 0.0995,
+  "#38": 0.1015,
+  "#37": 0.104,
+  "#36": 0.1065,
+  "#35": 0.11,
+  "#34": 0.111,
+  "#33": 0.113,
+  "#32": 0.116,
+  "#31": 0.12,
+  "#30": 0.1285,
+  "#29": 0.136,
+  "#28": 0.1405,
+  "#27": 0.144,
+  "#26": 0.147,
+  "#25": 0.1495,
+  "#24": 0.152,
+  "#23": 0.154,
+  "#22": 0.157,
+  "#21": 0.159,
+  "#20": 0.161,
+  "#19": 0.166,
+  "#18": 0.1695,
+  "#17": 0.173,
+  "#16": 0.177,
+  "#15": 0.18,
+  "#14": 0.182,
+  "#13": 0.185,
+  "#12": 0.189,
+  "#11": 0.191,
+  "#10": 0.1935,
+  "#9": 0.196,
+  "#8": 0.199,
+  "#7": 0.201,
+  "#6": 0.204,
+  "#5": 0.2055,
+  "#4": 0.209,
+  "#3": 0.213,
+  "#2": 0.221,
+  "#1": 0.228,
+  "A": 0.234,
+  "B": 0.238,
+  "C": 0.242,
+  "D": 0.246,
+  "E": 0.25,
+  "F": 0.257,
+  "G": 0.261,
+  "H": 0.266,
+  "I": 0.272,
+  "J": 0.277,
+  "K": 0.281,
+  "L": 0.29,
+  "M": 0.295,
+  "N": 0.302,
+  "O": 0.316,
+  "P": 0.323,
+  "Q": 0.332,
+  "R": 0.339,
+  "S": 0.348,
+  "T": 0.358,
+  "U": 0.368,
+  "V": 0.377,
+  "W": 0.386,
+  "X": 0.397,
+  "Y": 0.404,
+  "Z": 0.413
+};
+},{}],"drill.ts":[function(require,module,exports) {
 "use strict";
+
+var __importDefault = this && this.__importDefault || function (mod) {
+  return mod && mod.__esModule ? mod : {
+    "default": mod
+  };
+};
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+
+var drill_lookup_json_1 = __importDefault(require("./drill_lookup.json"));
+
+var DrillLookup = drill_lookup_json_1.default;
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
 
 window.onload = function () {
@@ -155,7 +273,22 @@ function () {
     var material = this.materialsMenu.item(this.materialsMenu.selectedIndex);
     var val = material.value;
     var sfm = Number(val);
-    var diameter = Number(this.diameterElement.value);
+    var input = this.diameterElement.value;
+    var diameter = 0.0;
+
+    if (input in DrillLookup) {
+      diameter = DrillLookup[input];
+      setLabel("diameter_note", input + " has a diameter of " + diameter);
+    } else {
+      diameter = Number(input);
+
+      if (!diameter) {
+        setLabel("diameter_note", "Enter diameter like .25, A or #23");
+      } else {
+        setLabel("diameter_note", "Diameter " + diameter);
+      }
+    }
+
     var reco = recommend(sfm, diameter);
     setLabel("sfm", sfm);
     setLabel("rpm", reco.rpm);
@@ -182,7 +315,7 @@ function setLabel(id, value) {
   var output = document.getElementById(id);
   output.innerHTML = String(value);
 }
-},{}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./drill_lookup.json":"drill_lookup.json"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -210,7 +343,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "45465" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41495" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
