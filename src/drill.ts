@@ -4,6 +4,7 @@ const drillLookup = drillLookup_ as {
 };
 
 const fractionRe = /((\d+)\s+)?(\d+)\/(\d+)/;
+const mmRe = /(\d+(\.\d+)?)\s*mm/;
 
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
 
@@ -51,7 +52,7 @@ class Calculator {
         } else {
             diameter = Number(input);
             if (!diameter) {
-                const match = input.match(fractionRe);
+                let match = input.match(fractionRe);
                 if (match) {
                     let inches = Number(match[2])
                     if (!inches) {
@@ -66,7 +67,14 @@ class Calculator {
                         setLabel("diameter_note", `Diameter  ${numerator}/${denominator}=${diameter}`)
                     }
                 } else {
-                    setLabel("diameter_note", "Enter diameter like .25, 1/4, A or #23")
+                    match = input.match(mmRe);
+                    if (match) {
+                        const mm = Number(match[1])
+                        diameter = mm / 25.4
+                        setLabel("diameter_note", `Diameter  ${mm} mm=${diameter.toPrecision(4)}"`)
+                    } else {
+                        setLabel("diameter_note", "Enter diameter like .25, 1/4, 3mm, A or #23")
+                    }
                 }
             } else {
                 setLabel("diameter_note", `Diameter ${diameter}`)
