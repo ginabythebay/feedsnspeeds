@@ -299,9 +299,9 @@ function () {
           diameter = inches + numerator / denominator;
 
           if (inches) {
-            setLabel("diameter_note", "Diameter " + inches + " " + numerator + "/" + denominator + "=" + diameter);
+            setLabel("diameter_note", "Diameter " + inches + " " + numerator + "/" + denominator + "=" + diameter + "\"");
           } else {
-            setLabel("diameter_note", "Diameter  " + numerator + "/" + denominator + "=" + diameter);
+            setLabel("diameter_note", "Diameter  " + numerator + "/" + denominator + "=" + diameter + "\"");
           }
         } else {
           match = input.match(mmRe);
@@ -315,7 +315,7 @@ function () {
           }
         }
       } else {
-        setLabel("diameter_note", "Diameter " + diameter);
+        setLabel("diameter_note", "Diameter " + diameter + "\"");
       }
     }
 
@@ -323,7 +323,7 @@ function () {
     setLabel("sfm", sfm);
     setLabel("rpm", reco.rpm);
     setLabel("ipm", reco.ipm.toFixed(1));
-    setLabel("depth", reco.maxDepth.toFixed(3));
+    setLabel("depth", reco.maxDepth.toFixed(3) + "\"");
   };
 
   return Calculator;
@@ -373,7 +373,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41269" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33609" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
