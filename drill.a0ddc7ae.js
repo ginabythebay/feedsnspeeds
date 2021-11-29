@@ -240,7 +240,9 @@ Object.defineProperty(exports, "__esModule", {
 
 var drill_lookup_json_1 = __importDefault(require("./drill_lookup.json"));
 
-var DrillLookup = drill_lookup_json_1.default;
+var drillLookup = drill_lookup_json_1.default;
+var fractionRe = /((\d+)\s+)?(\d+)\/(\d+)/;
+var mmRe = /(\d+(\.\d+)?)\s*mm/;
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
 
 window.onload = function () {
@@ -276,14 +278,42 @@ function () {
     var input = this.diameterElement.value;
     var diameter = 0.0;
 
-    if (input in DrillLookup) {
-      diameter = DrillLookup[input];
+    if (input in drillLookup) {
+      diameter = drillLookup[input];
       setLabel("diameter_note", input + " has a diameter of " + diameter);
     } else {
       diameter = Number(input);
 
       if (!diameter) {
-        setLabel("diameter_note", "Enter diameter like .25, A or #23");
+        var match = input.match(fractionRe);
+
+        if (match) {
+          var inches = Number(match[2]);
+
+          if (!inches) {
+            inches = 0;
+          }
+
+          var numerator = Number(match[3]);
+          var denominator = Number(match[4]);
+          diameter = inches + numerator / denominator;
+
+          if (inches) {
+            setLabel("diameter_note", "Diameter " + inches + " " + numerator + "/" + denominator + "=" + diameter);
+          } else {
+            setLabel("diameter_note", "Diameter  " + numerator + "/" + denominator + "=" + diameter);
+          }
+        } else {
+          match = input.match(mmRe);
+
+          if (match) {
+            var mm = Number(match[1]);
+            diameter = mm / 25.4;
+            setLabel("diameter_note", "Diameter  " + mm + " mm=" + diameter.toPrecision(4) + "\"");
+          } else {
+            setLabel("diameter_note", "Enter diameter like .25, 1/4, 3mm, A or #23");
+          }
+        }
       } else {
         setLabel("diameter_note", "Diameter " + diameter);
       }
@@ -343,7 +373,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41495" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "41269" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
