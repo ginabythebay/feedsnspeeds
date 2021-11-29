@@ -1,7 +1,9 @@
-import drillLookup from "./drill_lookup.json"
-const DrillLookup = drillLookup as {
+import drillLookup_ from "./drill_lookup.json"
+const drillLookup = drillLookup_ as {
     [key: string]: number
 };
+
+const fractionRe = /((\d+)\s+)?(\d+)\/(\d+)/;
 
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
 
@@ -43,13 +45,29 @@ class Calculator {
 
         let input = this.diameterElement.value as string;
         let diameter = 0.0;
-        if (input in DrillLookup) {
-            diameter = DrillLookup[input]
+        if (input in drillLookup) {
+            diameter = drillLookup[input]
             setLabel("diameter_note", `${input} has a diameter of ${diameter}`)
         } else {
             diameter = Number(input);
             if (!diameter) {
-                setLabel("diameter_note", "Enter diameter like .25, A or #23")
+                const match = input.match(fractionRe);
+                if (match) {
+                    let inches = Number(match[2])
+                    if (!inches) {
+                        inches = 0
+                    }
+                    const numerator = Number(match[3])
+                    const denominator = Number(match[4])
+                    diameter = inches + numerator / denominator
+                    if (inches) {
+                        setLabel("diameter_note", `Diameter ${inches} ${numerator}/${denominator}=${diameter}`)
+                    } else {
+                        setLabel("diameter_note", `Diameter  ${numerator}/${denominator}=${diameter}`)
+                    }
+                } else {
+                    setLabel("diameter_note", "Enter diameter like .25, 1/4, A or #23")
+                }
             } else {
                 setLabel("diameter_note", `Diameter ${diameter}`)
             }
