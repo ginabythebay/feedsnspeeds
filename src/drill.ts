@@ -62,9 +62,9 @@ class Calculator {
                     const denominator = Number(match[4])
                     diameter = inches + numerator / denominator
                     if (inches) {
-                        setLabel("diameter_note", `Diameter ${inches} ${numerator}/${denominator}=${diameter}`)
+                        setLabel("diameter_note", `Diameter ${inches} ${numerator}/${denominator}=${diameter}"`)
                     } else {
-                        setLabel("diameter_note", `Diameter  ${numerator}/${denominator}=${diameter}`)
+                        setLabel("diameter_note", `Diameter  ${numerator}/${denominator}=${diameter}"`)
                     }
                 } else {
                     match = input.match(mmRe);
@@ -77,7 +77,7 @@ class Calculator {
                     }
                 }
             } else {
-                setLabel("diameter_note", `Diameter ${diameter}`)
+                setLabel("diameter_note", `Diameter ${diameter}"`)
             }
         }
 
@@ -87,7 +87,7 @@ class Calculator {
         setLabel("sfm", sfm)
         setLabel("rpm", reco.rpm)
         setLabel("ipm", reco.ipm.toFixed(1))
-        setLabel("depth", reco.maxDepth.toFixed(3))
+        setLabel("depth", `${reco.maxDepth.toFixed(3)}"`)
     }
 }
 
