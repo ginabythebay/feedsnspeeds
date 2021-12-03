@@ -117,7 +117,7 @@ parcelRequire = (function (modules, cache, entry, globalName) {
   }
 
   return newRequire;
-})({"drill_lookup.json":[function(require,module,exports) {
+})({"data/drill_lookup.json":[function(require,module,exports) {
 module.exports = {
   "#80": 0.0135,
   "#79": 0.0145,
@@ -225,6 +225,16 @@ module.exports = {
   "Y": 0.404,
   "Z": 0.413
 };
+},{}],"data/material_lookup.json":[function(require,module,exports) {
+module.exports = {
+  "Aluminum": {
+    "6061: Solution Treated and Aged": 350,
+    "6061: Cold Drawn": 400
+  },
+  "Stainless Steel": {
+    "316: 135-185": 50
+  }
+};
 },{}],"drill.ts":[function(require,module,exports) {
 "use strict";
 
@@ -238,24 +248,43 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var drill_lookup_json_1 = __importDefault(require("./drill_lookup.json"));
+var drill_lookup_json_1 = __importDefault(require("./data/drill_lookup.json"));
 
 var drillLookup = drill_lookup_json_1.default;
+
+var material_lookup_json_1 = __importDefault(require("./data/material_lookup.json"));
+
+var materialLookup = material_lookup_json_1.default;
 var fractionRe = /((\d+)\s+)?(\d+)\/(\d+)/;
 var mmRe = /(\d+(\.\d+)?)\s*mm/;
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
 
 window.onload = function () {
   var materialsMenu = document.getElementById("material");
+  var typesMenu = document.getElementById("material_type");
   var drillInput = document.getElementById("drill_diameter");
-  var calculator = new Calculator(materialsMenu, drillInput);
+  var calculator = new Calculator(typesMenu, drillInput);
+  var page = new DrillPage(materialsMenu, typesMenu);
   possibleEvents.forEach(function (eventName) {
     drillInput.addEventListener(eventName, function () {
       calculator.calc();
     });
   });
 
+  for (var m in materialLookup) {
+    var option = document.createElement("option");
+    option.text = m;
+    materialsMenu.options.add(option);
+  }
+
   materialsMenu.onchange = function () {
+    page.reloadTypes();
+    calculator.calc();
+  };
+
+  page.reloadTypes();
+
+  typesMenu.onchange = function () {
     calculator.calc();
   }; // calcs value on page reload if something was already entered
 
@@ -263,18 +292,57 @@ window.onload = function () {
   calculator.calc();
 };
 
+var DrillPage =
+/** @class */
+function () {
+  function DrillPage(materialsMenu, typesMenu) {
+    this.materialsMenu = materialsMenu;
+    this.typesMenu = typesMenu;
+  }
+
+  DrillPage.prototype.reloadTypes = function () {
+    var _this = this;
+
+    removeOptions(this.typesMenu);
+    var material = this.materialsMenu.item(this.materialsMenu.selectedIndex);
+    var types = materialLookup[material.text];
+    Object.keys(types).forEach(function (name) {
+      var option = document.createElement("option");
+      option.text = name + " (" + types[name] + ")";
+      option.value = String(types[name]);
+
+      _this.typesMenu.options.add(option);
+    });
+  };
+
+  ;
+  return DrillPage;
+}();
+
+;
+
+function removeOptions(selectElement) {
+  var L = selectElement.options.length - 1;
+
+  for (var i = L; i >= 0; i--) {
+    selectElement.remove(i);
+  }
+}
+
+;
+
 var Calculator =
 /** @class */
 function () {
-  function Calculator(materialsMenu, diameterElement) {
-    this.materialsMenu = materialsMenu.options;
+  function Calculator(typessMenu, diameterElement) {
+    this.typesMenu = typessMenu.options;
     this.diameterElement = diameterElement;
   }
 
   Calculator.prototype.calc = function () {
-    var material = this.materialsMenu.item(this.materialsMenu.selectedIndex);
-    var val = material.value;
-    var sfm = Number(val);
+    var type = this.typesMenu.item(this.typesMenu.selectedIndex);
+    var sfm = Number(type.value);
+    setLabel("sfm", displayNum(sfm));
     var input = this.diameterElement.value;
     var diameter = 0.0;
 
@@ -320,14 +388,29 @@ function () {
     }
 
     var reco = recommend(sfm, diameter);
-    setLabel("sfm", sfm);
-    setLabel("rpm", reco.rpm);
-    setLabel("ipm", reco.ipm.toFixed(1));
-    setLabel("depth", reco.maxDepth.toFixed(3) + "\"");
+    setLabel("rpm", displayNum(reco.rpm));
+    setLabel("ipm", fixedDisplayNum(reco.ipm, 1));
+    setLabel("depth", fixedDisplayNum(reco.maxDepth, 3) + "\"");
   };
 
   return Calculator;
 }();
+
+function displayNum(value) {
+  if (Number.isNaN(value) || value == Infinity || !value) {
+    return "--";
+  } else {
+    return String(value);
+  }
+}
+
+function fixedDisplayNum(value, precision) {
+  if (Number.isNaN(value) || value == Infinity || !value) {
+    return "--";
+  } else {
+    return value.toFixed(precision);
+  }
+}
 
 function recommend(sfm, diameter) {
   var ipr = Math.min(.25, .001 * (diameter / .0625));
@@ -345,7 +428,7 @@ function setLabel(id, value) {
   var output = document.getElementById(id);
   output.innerHTML = String(value);
 }
-},{"./drill_lookup.json":"drill_lookup.json"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
+},{"./data/drill_lookup.json":"data/drill_lookup.json","./data/material_lookup.json":"data/material_lookup.json"}],"../node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
 var OldModule = module.bundle.Module;
@@ -373,7 +456,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "33609" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43231" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
