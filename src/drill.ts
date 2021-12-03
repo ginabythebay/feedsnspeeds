@@ -92,9 +92,8 @@ class Calculator {
 
     calc() {
         const type = this.typesMenu.item(this.typesMenu.selectedIndex) as HTMLOptionElement;
-        console.log(`in calc, type value=${type.value}`)
         const sfm = Number(type.value);
-        setLabel("sfm", sfm)
+        setLabel("sfm", displayNum(sfm))
 
         let input = this.diameterElement.value as string;
         let diameter = 0.0;
@@ -136,9 +135,25 @@ class Calculator {
 
         let reco = recommend(sfm, diameter);
 
-        setLabel("rpm", reco.rpm)
-        setLabel("ipm", reco.ipm.toFixed(1))
-        setLabel("depth", `${reco.maxDepth.toFixed(3)}"`)
+        setLabel("rpm", displayNum(reco.rpm))
+        setLabel("ipm", fixedDisplayNum(reco.ipm, 1))
+        setLabel("depth", `${fixedDisplayNum(reco.maxDepth, 3)}"`)
+    }
+}
+
+function displayNum(value: number): string {
+    if (Number.isNaN(value) || value == Infinity || !value) {
+        return "--";
+    } else {
+        return String(value);
+    }
+}
+
+function fixedDisplayNum(value: number, precision: number): string {
+    if (Number.isNaN(value) || value == Infinity || !value) {
+        return "--";
+    } else {
+        return value.toFixed(precision);
     }
 }
 
@@ -148,7 +163,7 @@ export function recommend(sfm: number, diameter: number): DrillReco {
     return { rpm: rpm, ipm: ipr * rpm, maxDepth: diameter * 4 }
 }
 
-function setLabel(id: string, value: number | string) {
+function setLabel(id: string, value: string) {
     const output = document.getElementById(id) as HTMLLabelElement;
     output.innerHTML = String(value)
 }
