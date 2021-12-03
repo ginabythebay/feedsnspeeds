@@ -1,4 +1,4 @@
-import drillLookup_ from "./drill_lookup.json"
+import drillLookup_ from "./data/drill_lookup.json"
 const drillLookup = drillLookup_ as {
     [key: string]: number
 };
