@@ -2,6 +2,12 @@ import drillLookup_ from "./data/drill_lookup.json"
 const drillLookup = drillLookup_ as {
     [key: string]: number
 };
+import materialLookup_ from "./data/material_lookup.json"
+const materialLookup = materialLookup_ as {
+    [key: string]: {
+        [key: string]: number
+    }
+};
 
 const fractionRe = /((\d+)\s+)?(\d+)\/(\d+)/;
 const mmRe = /(\d+(\.\d+)?)\s*mm/;
@@ -10,18 +16,63 @@ var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "p
 
 window.onload = () => {
     const materialsMenu = document.getElementById("material") as HTMLSelectElement;
+    const typesMenu = document.getElementById("material_type") as HTMLSelectElement;
     const drillInput = document.getElementById("drill_diameter") as HTMLInputElement;
-    const calculator: Calculator = new Calculator(materialsMenu, drillInput)
+    const calculator: Calculator = new Calculator(typesMenu, drillInput);
+    const page: DrillPage = new DrillPage(materialsMenu, typesMenu);
     possibleEvents.forEach((eventName: string) => {
         drillInput.addEventListener(eventName, () => {
             calculator.calc()
         })
     });
+
+    for (let m in materialLookup) {
+        const option = document.createElement("option") as HTMLOptionElement;
+        option.text = m;
+        materialsMenu.options.add(option);
+    }
+
     materialsMenu.onchange = () => {
+        page.reloadTypes()
+        calculator.calc();
+    }
+    page.reloadTypes();
+
+    typesMenu.onchange = () => {
         calculator.calc();
     }
     // calcs value on page reload if something was already entered
     calculator.calc();
+};
+
+class DrillPage {
+    materialsMenu: HTMLSelectElement;
+    typesMenu: HTMLSelectElement;
+
+    constructor(materialsMenu: HTMLSelectElement, typesMenu: HTMLSelectElement) {
+        this.materialsMenu = materialsMenu;
+        this.typesMenu = typesMenu;
+    }
+
+    reloadTypes() {
+        removeOptions(this.typesMenu);
+        const material = this.materialsMenu.item(this.materialsMenu.selectedIndex) as HTMLOptionElement;
+        const types = materialLookup[material.text];
+        Object.keys(types).forEach(name => {
+            const option = document.createElement("option") as HTMLOptionElement;
+            option.text = `${name} (${types[name]})`;
+            option.value = String(types[name]);
+            this.typesMenu.options.add(option);
+        })
+    };
+
+};
+
+function removeOptions(selectElement: HTMLSelectElement) {
+    const L = selectElement.options.length - 1;
+    for (let i = L; i >= 0; i--) {
+        selectElement.remove(i);
+    }
 };
 
 interface DrillReco {
@@ -31,18 +82,19 @@ interface DrillReco {
 }
 
 class Calculator {
-    materialsMenu: HTMLOptionsCollection;
+    typesMenu: HTMLOptionsCollection;
     diameterElement: HTMLInputElement;
 
-    constructor(materialsMenu: HTMLSelectElement, diameterElement: HTMLInputElement) {
-        this.materialsMenu = materialsMenu.options;
+    constructor(typessMenu: HTMLSelectElement, diameterElement: HTMLInputElement) {
+        this.typesMenu = typessMenu.options;
         this.diameterElement = diameterElement;
     }
 
     calc() {
-        const material = this.materialsMenu.item(this.materialsMenu.selectedIndex) as HTMLOptionElement;
-        const val = material.value;
-        const sfm = Number(val);
+        const type = this.typesMenu.item(this.typesMenu.selectedIndex) as HTMLOptionElement;
+        console.log(`in calc, type value=${type.value}`)
+        const sfm = Number(type.value);
+        setLabel("sfm", sfm)
 
         let input = this.diameterElement.value as string;
         let diameter = 0.0;
@@ -84,7 +136,6 @@ class Calculator {
 
         let reco = recommend(sfm, diameter);
 
-        setLabel("sfm", sfm)
         setLabel("rpm", reco.rpm)
         setLabel("ipm", reco.ipm.toFixed(1))
         setLabel("depth", `${reco.maxDepth.toFixed(3)}"`)
