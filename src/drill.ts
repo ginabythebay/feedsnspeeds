@@ -127,6 +127,7 @@ function removeOptions(selectElement: HTMLSelectElement) {
 
 interface DrillReco {
     rpm: number;
+    ipr: number;
     ipm: number;
     maxDepth: number;
 }
@@ -183,10 +184,19 @@ class Calculator {
             }
         }
 
+        // the call to recommend below can throw and error if given an
+        // invalid diameter.  To avoid displaying invalid parameters,
+        // we start by zeroing out the display before the potential
+        // error.
+        setLabel("rpm", "--")
+        setLabel("ipr", "--")
+        setLabel("ipm", "--")
+        setLabel("depth", "--")
 
-        let reco = recommend(sfm, diameter);
+        let reco = recommend(sfm, diameter, Number(type["fr_offset"]));
 
         setLabel("rpm", displayNum(reco.rpm))
+        setLabel("ipr", fixedDisplayNum(reco.ipr, 3))
         setLabel("ipm", fixedDisplayNum(reco.ipm, 1))
         setLabel("depth", `${fixedDisplayNum(reco.maxDepth, 3)}"`)
     }
@@ -208,10 +218,10 @@ function fixedDisplayNum(value: number, precision: number): string {
     }
 }
 
-export function recommend(sfm: number, diameter: number): DrillReco {
-    const ipr = Math.min(.25, .001 * (diameter / .0625))
+export function recommend(sfm: number, diameter: number, fr_offset: number): DrillReco {
+    const ipr = calcIpr(diameter, fr_offset);
     const rpm = Math.round((3.8197 / diameter) * sfm)
-    return { rpm: rpm, ipm: ipr * rpm, maxDepth: diameter * 4 }
+    return { rpm: rpm, ipr: ipr, ipm: ipr * rpm, maxDepth: diameter * 4 }
 }
 
 // diameter is inches
@@ -250,7 +260,7 @@ export function calcIpr(diameter: number, fr_offset: number): number {
         }
 
     }
-    throw new Error('Unable to find range for diameter of ${diameter}')
+    throw new Error(`Unable to find range for diameter of ${diameter}`)
 }
 
 function setLabel(id: string, value: string) {
