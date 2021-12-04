@@ -228,11 +228,20 @@ module.exports = {
 },{}],"data/material_lookup.json":[function(require,module,exports) {
 module.exports = {
   "Aluminum": {
-    "6061: Solution Treated and Aged": 350,
-    "6061: Cold Drawn": 400
+    "6061: Solution Treated and Aged": {
+      "fr_offset": 5,
+      "drill_sfm": 350
+    },
+    "6061: Cold Drawn": {
+      "fr_offset": 5,
+      "drill_sfm": 400
+    }
   },
   "Stainless Steel": {
-    "316: 135-185": 50
+    "316: 135-185": {
+      "fr_offset": 1,
+      "drill_sfm": 50
+    }
   }
 };
 },{}],"drill.ts":[function(require,module,exports) {
@@ -254,7 +263,34 @@ var drillLookup = drill_lookup_json_1.default;
 
 var material_lookup_json_1 = __importDefault(require("./data/material_lookup.json"));
 
-var materialLookup = material_lookup_json_1.default;
+var materialLookup = material_lookup_json_1.default; // Data from Machinery's Handbook 31 page 1128.
+
+var feedRates = [{
+  minDiameter: 0,
+  maxDiameter: .125,
+  minFr: .001,
+  maxFr: .003
+}, {
+  minDiameter: .125,
+  maxDiameter: .251,
+  minFr: .002,
+  maxFr: .006
+}, {
+  minDiameter: .251,
+  maxDiameter: .501,
+  minFr: .004,
+  maxFr: .010
+}, {
+  minDiameter: .501,
+  maxDiameter: 1.01,
+  minFr: .007,
+  maxFr: .015
+}, {
+  minDiameter: 1.01,
+  maxDiameter: 0,
+  minFr: .010,
+  maxFr: .025
+}];
 var fractionRe = /((\d+)\s+)?(\d+)\/(\d+)/;
 var mmRe = /(\d+(\.\d+)?)\s*mm/;
 var possibleEvents = new Set(["input", "onpropertychange", "keyup", "change", "paste"]);
@@ -308,8 +344,9 @@ function () {
     var types = materialLookup[material.text];
     Object.keys(types).forEach(function (name) {
       var option = document.createElement("option");
-      option.text = name + " (" + types[name] + ")";
-      option.value = String(types[name]);
+      var sfm = types[name]["drill_sfm"];
+      option.text = name + " (" + sfm + ")";
+      option.type = types[name];
 
       _this.typesMenu.options.add(option);
     });
@@ -340,8 +377,9 @@ function () {
   }
 
   Calculator.prototype.calc = function () {
-    var type = this.typesMenu.item(this.typesMenu.selectedIndex);
-    var sfm = Number(type.value);
+    var typeOption = this.typesMenu.item(this.typesMenu.selectedIndex);
+    var type = typeOption.type;
+    var sfm = Number(type["drill_sfm"]);
     setLabel("sfm", displayNum(sfm));
     var input = this.diameterElement.value;
     var diameter = 0.0;
@@ -385,10 +423,19 @@ function () {
       } else {
         setLabel("diameter_note", "Diameter " + diameter + "\"");
       }
-    }
+    } // the call to recommend below can throw and error if given an
+    // invalid diameter.  To avoid displaying invalid parameters,
+    // we start by zeroing out the display before the potential
+    // error.
 
-    var reco = recommend(sfm, diameter);
+
+    setLabel("rpm", "--");
+    setLabel("ipr", "--");
+    setLabel("ipm", "--");
+    setLabel("depth", "--");
+    var reco = recommend(sfm, diameter, Number(type["fr_offset"]));
     setLabel("rpm", displayNum(reco.rpm));
+    setLabel("ipr", fixedDisplayNum(reco.ipr, 3));
     setLabel("ipm", fixedDisplayNum(reco.ipm, 1));
     setLabel("depth", fixedDisplayNum(reco.maxDepth, 3) + "\"");
   };
@@ -412,17 +459,63 @@ function fixedDisplayNum(value, precision) {
   }
 }
 
-function recommend(sfm, diameter) {
-  var ipr = Math.min(.25, .001 * (diameter / .0625));
+function recommend(sfm, diameter, fr_offset) {
+  var ipr = calcIpr(diameter, fr_offset);
   var rpm = Math.round(3.8197 / diameter * sfm);
   return {
     rpm: rpm,
+    ipr: ipr,
     ipm: ipr * rpm,
     maxDepth: diameter * 4
   };
 }
 
-exports.recommend = recommend;
+exports.recommend = recommend; // diameter is inches
+// fr_offset is a value between 1 and 5
+//
+// once we find a range, we apply the fr_offset to it.  Imagining a range of 1 to 11, we distribute it like this:
+// range  fr_offset
+// 1      1
+// 2
+// 3
+// 3.5    2
+// 4
+// 5
+// 6      3
+// 7
+// 8
+// 8.5    4
+// 9
+// 10
+// 11     5
+
+function calcIpr(diameter, fr_offset) {
+  if (fr_offset < 1 || fr_offset > 5) {
+    throw new RangeError('fr_offset must bet between 1 and 5: ${fr_offset} is invalid');
+  }
+
+  for (var _i = 0, feedRates_1 = feedRates; _i < feedRates_1.length; _i++) {
+    var frr = feedRates_1[_i];
+
+    if (diameter >= frr.minDiameter && (frr.maxDiameter == 0 || diameter < frr.maxDiameter)) {
+      if (fr_offset == 1) {
+        return frr.minFr;
+      }
+
+      if (fr_offset == 5) {
+        return frr.maxFr;
+      }
+
+      var offset = .25 * (fr_offset - 1);
+      var range = frr.maxFr - frr.minFr;
+      return frr.minFr + range * offset;
+    }
+  }
+
+  throw new Error("Unable to find range for diameter of " + diameter);
+}
+
+exports.calcIpr = calcIpr;
 
 function setLabel(id, value) {
   var output = document.getElementById(id);
@@ -456,7 +549,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "43231" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37031" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
