@@ -415,7 +415,7 @@ function () {
           if (match) {
             var mm = Number(match[1]);
             diameter = mm / 25.4;
-            setLabel("diameter_note", "Diameter  " + mm + " mm=" + diameter.toPrecision(4) + "\"");
+            setLabel("diameter_note", "Diameter " + mm + "mm=" + diameter.toPrecision(4) + "\"");
           } else {
             setLabel("diameter_note", "Enter diameter like .25, 1/4, 3mm, A or #23");
           }
@@ -549,7 +549,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "37031" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "39359" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
