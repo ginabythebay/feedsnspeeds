@@ -1,9 +1,18 @@
 {
     "Aluminum": {
-        "6061: Solution Treated and Aged": 350,
-        "6061: Cold Drawn": 400
+        "6061: Solution Treated and Aged": {
+            "fr_offset": 5,
+            "drill_sfm": 350
+        },
+        "6061: Cold Drawn": {
+            "fr_offset": 5,
+            "drill_sfm": 400
+        }
     },
     "Stainless Steel": {
-        "316: 135-185": 50
+        "316: 135-185": {
+            "fr_offset": 1,
+            "drill_sfm": 50
+        }
     }
 }

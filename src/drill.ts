@@ -5,7 +5,9 @@ const drillLookup = drillLookup_ as {
 import materialLookup_ from "./data/material_lookup.json"
 const materialLookup = materialLookup_ as {
     [key: string]: {
-        [key: string]: number
+        [key: string]: {
+            [key: string]: number
+        }
     }
 };
 
@@ -45,6 +47,12 @@ window.onload = () => {
     calculator.calc();
 };
 
+interface TypeOption extends HTMLOptionElement {
+    type: {
+        [key: string]: number
+    }
+}
+
 class DrillPage {
     materialsMenu: HTMLSelectElement;
     typesMenu: HTMLSelectElement;
@@ -59,9 +67,10 @@ class DrillPage {
         const material = this.materialsMenu.item(this.materialsMenu.selectedIndex) as HTMLOptionElement;
         const types = materialLookup[material.text];
         Object.keys(types).forEach(name => {
-            const option = document.createElement("option") as HTMLOptionElement;
-            option.text = `${name} (${types[name]})`;
-            option.value = String(types[name]);
+            const option = document.createElement("option") as TypeOption;
+            const sfm = types[name]["drill_sfm"]
+            option.text = `${name} (${sfm})`;
+            option.type = types[name];
             this.typesMenu.options.add(option);
         })
     };
@@ -91,8 +100,9 @@ class Calculator {
     }
 
     calc() {
-        const type = this.typesMenu.item(this.typesMenu.selectedIndex) as HTMLOptionElement;
-        const sfm = Number(type.value);
+        const typeOption = this.typesMenu.item(this.typesMenu.selectedIndex) as TypeOption;
+        const type = typeOption.type;
+        const sfm = Number(type["drill_sfm"]);
         setLabel("sfm", displayNum(sfm))
 
         let input = this.diameterElement.value as string;
