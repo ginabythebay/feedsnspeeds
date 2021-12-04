@@ -11,6 +11,47 @@ const materialLookup = materialLookup_ as {
     }
 };
 
+interface FeedRateRange {
+    minDiameter: number  // inches, inclusive
+    maxDiameter: number  // inches, exclusive
+    minFr: number // inches per revolution
+    maxFr: number // inches per revolution
+}
+
+// Data from Machinery's Handbook 31 page 1128.
+const feedRates = [
+    {
+        minDiameter: 0,
+        maxDiameter: .125,
+        minFr: .001,
+        maxFr: .003,
+    },
+    {
+        minDiameter: .125,
+        maxDiameter: .251,
+        minFr: .002,
+        maxFr: .006,
+    },
+    {
+        minDiameter: .251,
+        maxDiameter: .501,
+        minFr: .004,
+        maxFr: .010,
+    },
+    {
+        minDiameter: .501,
+        maxDiameter: 1.01,
+        minFr: .007,
+        maxFr: .015,
+    },
+    {
+        minDiameter: 1.01,
+        maxDiameter: 0,
+        minFr: .010,
+        maxFr: .025,
+    },
+];
+
 const fractionRe = /((\d+)\s+)?(\d+)\/(\d+)/;
 const mmRe = /(\d+(\.\d+)?)\s*mm/;
 
@@ -171,6 +212,45 @@ export function recommend(sfm: number, diameter: number): DrillReco {
     const ipr = Math.min(.25, .001 * (diameter / .0625))
     const rpm = Math.round((3.8197 / diameter) * sfm)
     return { rpm: rpm, ipm: ipr * rpm, maxDepth: diameter * 4 }
+}
+
+// diameter is inches
+// fr_offset is a value between 1 and 5
+//
+// once we find a range, we apply the fr_offset to it.  Imagining a range of 1 to 11, we distribute it like this:
+// range  fr_offset
+// 1      1
+// 2
+// 3
+// 3.5    2
+// 4
+// 5
+// 6      3
+// 7
+// 8
+// 8.5    4
+// 9
+// 10
+// 11     5
+export function calcIpr(diameter: number, fr_offset: number): number {
+    if (fr_offset < 1 || fr_offset > 5) {
+        throw new RangeError('fr_offset must bet between 1 and 5: ${fr_offset} is invalid');
+    }
+    for (let frr of feedRates) {
+        if (diameter >= frr.minDiameter && (frr.maxDiameter == 0 || diameter < frr.maxDiameter)) {
+            if (fr_offset == 1) {
+                return frr.minFr;
+            }
+            if (fr_offset == 5) {
+                return frr.maxFr;
+            }
+            const offset = .25 * (fr_offset - 1);
+            const range = frr.maxFr - frr.minFr;
+            return frr.minFr + (range * offset);
+        }
+
+    }
+    throw new Error('Unable to find range for diameter of ${diameter}')
 }
 
 function setLabel(id: string, value: string) {
