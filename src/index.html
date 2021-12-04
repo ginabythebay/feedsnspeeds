@@ -27,16 +27,15 @@
                 <input type="text" placeholder="diameter (inches, e.g. 1.25)" id="drill_diameter" size="17" autofocus="autofocus" />
             </div>
         </form>
+        <div class="note" id="diameter_note"></div>
         <div class="item">
-            SFM: <label id="sfm"></label>
-            RPM: <label id="rpm"></label>
-            IPR: <label id="ipr"></label>
-            Plunge Rate (IPM): <label id="ipm"></label>
+            SFM: <label title="Based on the type of material chosen. See tables starting at p. 1129 Machinery's Handbook 31st edition." id="sfm"></label>
+            RPM: <label title="(SFM/diameter)*3.8197.  See p. 1084 Machinery's Handbook 31st edition." id="rpm"></label>
+            IPR: <label title="Based on diameter and material. See p. 1128 Machinery's Handbook 31st edition" id="ipr"></label>
+            Plunge Rate (IPM): <label title="IPR*RPM" id="ipm"></label>
         </div>
         <div class="item">
-            Values good to a hole depth of: <label id="depth"></label>
-        </div>
-        <div class="note" id="diameter_note">
+            Values good to a hole depth of: <label title="4*diameter" id="depth"></label>
         </div>
         <div class="para">
             Please check these values against a trusted source.  I do

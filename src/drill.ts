@@ -174,7 +174,7 @@ class Calculator {
                     if (match) {
                         const mm = Number(match[1])
                         diameter = mm / 25.4
-                        setLabel("diameter_note", `Diameter  ${mm} mm=${diameter.toPrecision(4)}"`)
+                        setLabel("diameter_note", `Diameter ${mm}mm=${diameter.toPrecision(4)}"`)
                     } else {
                         setLabel("diameter_note", "Enter diameter like .25, 1/4, 3mm, A or #23")
                     }
