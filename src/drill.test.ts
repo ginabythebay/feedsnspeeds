@@ -3,10 +3,11 @@ import { calcIpr } from './drill';
 const drill = require('./drill.ts');
 
 test('verifies 1/4 drill in Aluminum', () => {
-    let reco = (drill.recommend(250, .25));
-    expect(reco).toContainKeys(['rpm', 'ipm', 'maxDepth']);
-    expect(reco.rpm).toBe(3820);
-    expect(reco.ipm).toBeCloseTo(15.28);
+    let reco = (drill.recommend(350, .25, 5));
+    expect(reco).toContainKeys(['rpm', 'ipr', 'ipm', 'maxDepth']);
+    expect(reco.rpm).toBe(5348);  // (sfm/diameter)*3.8197
+    expect(reco.ipr).toBe(.006)
+    expect(reco.ipm).toBeCloseTo(32.088);  // ipr * rpm
     expect(reco.maxDepth).toBe(1);
 });
 
