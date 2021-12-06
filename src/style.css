@@ -83,6 +83,31 @@ html {
     font-size: 1.6rem;
   }
 
+  #sfm {
+      min-width: 2em;
+      text-align: end;
+  }
+
+  #rpm {
+      min-width: 3em;
+      text-align: end;
+  }
+
+  #ipr {
+      min-width: 2.5em;
+      text-align: end;
+  }
+
+  #ipm {
+      min-width: 2em;
+      text-align: end;
+  }
+
+  #depth {
+      min-width: 3.3em;
+      text-align: end;
+  }
+
   .note {
     position: relative;
     display: flex;

@@ -10,7 +10,7 @@
 <body>
     <div id="container">
         <h1>[ HSS Drilling ]</h1>
-            <div class="item">
+            <div id="mateterial_group" class="item">
                 <div class="item">
                     <label for="material">Material:</label>
                     <select id="material">
@@ -24,7 +24,7 @@
             </div>
         <form>
             <div class="input">
-                <input type="text" placeholder="diameter (inches, e.g. 1.25)" id="drill_diameter" size="17" autofocus="autofocus" />
+                <input type="text" placeholder="enter diameter here" id="drill_diameter" size="17" autofocus="autofocus" />
             </div>
         </form>
         <div class="note" id="diameter_note"></div>
@@ -38,9 +38,9 @@
             Values good to a hole depth of: <label title="4*diameter" id="depth"></label>
         </div>
         <div class="para">
-            Please check these values against a trusted source.  I do
+            Please check these values with a trusted source.  I do
             not know your situation and cannot take responsibility for
-            the results if you use these values.
+            the results.
         </div>
     </div>
     <script src="./drill.ts"></script>
