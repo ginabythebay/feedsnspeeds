@@ -237,8 +237,22 @@ module.exports = {
       "drill_sfm": 400
     }
   },
+  "Steel": {
+    "4140, 4150: 250-300": {
+      "fr_offset": 3,
+      "drill_sfm": 55
+    }
+  },
   "Stainless Steel": {
     "316: 135-185": {
+      "fr_offset": 1,
+      "drill_sfm": 50
+    },
+    "203EZ, 303, 303Se, 303MA, 303Pb, 303Cu, 303 Plus X: 135-185": {
+      "fr_offset": 1,
+      "drill_sfm": 55
+    },
+    "203EZ, 303, 303Se, 303MA, 303Pb, 303Cu, 303 Plus X: 225-275": {
       "fr_offset": 1,
       "drill_sfm": 50
     }
@@ -433,11 +447,14 @@ function () {
     setLabel("ipr", "--");
     setLabel("ipm", "--");
     setLabel("depth", "--");
-    var reco = recommend(sfm, diameter, Number(type["fr_offset"]));
-    setLabel("rpm", displayNum(reco.rpm));
-    setLabel("ipr", fixedDisplayNum(reco.ipr, 3));
-    setLabel("ipm", fixedDisplayNum(reco.ipm, 1));
-    setLabel("depth", fixedDisplayNum(reco.maxDepth, 3) + "\"");
+
+    if (diameter) {
+      var reco = recommend(sfm, diameter, Number(type["fr_offset"]));
+      setLabel("rpm", displayNum(reco.rpm));
+      setLabel("ipr", fixedDisplayNum(reco.ipr, 3));
+      setLabel("ipm", fixedDisplayNum(reco.ipm, 1));
+      setLabel("depth", fixedDisplayNum(reco.maxDepth, 3) + "\"");
+    }
   };
 
   return Calculator;
@@ -512,7 +529,7 @@ function calcIpr(diameter, fr_offset) {
     }
   }
 
-  throw new Error("Unable to find range for diameter of " + diameter);
+  throw new RangeError("Unable to find range for diameter of " + diameter);
 }
 
 exports.calcIpr = calcIpr;
@@ -549,7 +566,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "34889" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "42675" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
