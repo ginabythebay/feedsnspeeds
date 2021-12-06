@@ -193,12 +193,14 @@ class Calculator {
         setLabel("ipm", "--")
         setLabel("depth", "--")
 
-        let reco = recommend(sfm, diameter, Number(type["fr_offset"]));
+        if (diameter) {
+            let reco = recommend(sfm, diameter, Number(type["fr_offset"]));
 
-        setLabel("rpm", displayNum(reco.rpm))
-        setLabel("ipr", fixedDisplayNum(reco.ipr, 3))
-        setLabel("ipm", fixedDisplayNum(reco.ipm, 1))
-        setLabel("depth", `${fixedDisplayNum(reco.maxDepth, 3)}"`)
+            setLabel("rpm", displayNum(reco.rpm))
+            setLabel("ipr", fixedDisplayNum(reco.ipr, 3))
+            setLabel("ipm", fixedDisplayNum(reco.ipm, 1))
+            setLabel("depth", `${fixedDisplayNum(reco.maxDepth, 3)}"`)
+        }
     }
 }
 
@@ -260,7 +262,7 @@ export function calcIpr(diameter: number, fr_offset: number): number {
         }
 
     }
-    throw new Error(`Unable to find range for diameter of ${diameter}`)
+    throw new RangeError(`Unable to find range for diameter of ${diameter}`)
 }
 
 function setLabel(id: string, value: string) {

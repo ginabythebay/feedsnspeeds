@@ -9,8 +9,22 @@
             "drill_sfm": 400
         }
     },
+    "Steel": {
+        "4140, 4150: 250-300": {
+            "fr_offset": 3,
+            "drill_sfm": 55
+        }
+    },
     "Stainless Steel": {
         "316: 135-185": {
+            "fr_offset": 1,
+            "drill_sfm": 50
+        },
+        "203EZ, 303, 303Se, 303MA, 303Pb, 303Cu, 303 Plus X: 135-185": {
+            "fr_offset": 1,
+            "drill_sfm": 55
+        },
+        "203EZ, 303, 303Se, 303MA, 303Pb, 303Cu, 303 Plus X: 225-275": {
             "fr_offset": 1,
             "drill_sfm": 50
         }
